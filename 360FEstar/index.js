@@ -139,6 +139,15 @@
                 }
             }
         },
+
+        /**
+         * 清楚canvas上手势
+         */
+        clearTouched: function (canvas) {
+            var context = canvas.getContext("2d");
+            context.clearRect(0, 0, canvasObj.width, canvasObj.height);
+            canvasObj.drawCanvas(context, [], null);
+        },
         
         /**
          * 添加监听事件
@@ -195,6 +204,8 @@
                 if (gestureString === firstInput) {//两次密码相同
                     setTipsContent('密码设置成功');
                     setLocalInfo(gestureString);
+                    //设置radio为验证密码
+                    document.getElementsByTagName('input')[1].checked = 'checked';
                 } else {
                     setTipsContent('两次输入的不一致');
                     setPasswordTimes = 0;
@@ -250,11 +261,19 @@
         canvasObj.initCanvas(canvas);
         //设置默认选中radio
         var localInfo = getLocalInfo();
+        var radios = document.getElementsByName('choose');
         if (typeof localInfo === "string") {
-            document.getElementsByTagName('input')[1].checked = 'checked';
+            radios[1].checked = 'checked';
         } else {
-            document.getElementsByTagName('input')[0].checked = 'checked';
+            radios[0].checked = 'checked';
         }
+        //添加radio监听事件
+        for (var i = 0; i < radios.length; i++) {
+            radios[i].onclick = function() {
+                canvasObj.clearTouched(canvas);
+            }
+        }
+        
     }
 
     init();
