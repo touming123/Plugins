@@ -49,24 +49,16 @@ var canvasObj = {
     /**
      * 设置canvas尺寸，位置
      */
-    setCanvas: function(options) {
-        canvasObj.width = options.width || 300;
-        canvasObj.height = options.height || canvasObj.width;
-        canvasObj.top = options.top || 60;
-        canvasObj.left = options.left || 40;
-        canvasObj.R = options.R || 25;
-        canvasObj.offsetX = options.offsetX || 30;
-        canvasObj.offsetY = options.offsetY || 30;
-
-        canvasObj.circle.borderColor = options.circle.borderColor || "#d0d0d0";
-        canvasObj.circle.borderWidth = options.circle.borderWidth || 2;
-        canvasObj.circle.contendColor = options.circle.contendColor || "#ffffff";
-
-        canvasObj.circleSelected.borderColor = options.circleSelected.borderColor || "#fd8d00";
-        canvasObj.circleSelected.borderWidth = options.circleSelected.borderWidth || 2;
-        canvasObj.circleSelected.contendColor = options.circleSelected.contendColor || "#ffa723";
-        canvasObj.touchLine.lineColor = options.touchLine.lineColor || "#df2b1b";
-        canvasObj.touchLine.lineWidth = options.touchLine.lineWidth || 2;
+    setCanvas: function (options) {
+        for (var key in options) {
+            if (typeof options[key] === 'object') {
+                for (var innerKey in options[key]) {
+                    options[key][innerKey] ? canvasObj[key][innerKey] = options[key][innerKey] : null;
+                }
+            } else {
+                options[key] ? canvasObj[key] = options[key] : null;
+            }
+        }
 
         canvasObj.lenX = (canvasObj.width - 2 * canvasObj.offsetX - canvasObj.R * 2 * 3) / 2;
         canvasObj.lenY = (canvasObj.height - 2 * canvasObj.offsetX - canvasObj.R * 2 * 3) / 2;
@@ -76,7 +68,7 @@ var canvasObj = {
     /**
      * 初始化canvas，添加监听事件
      */
-    initCanvas: function(canvas, handleAction) {
+    initCanvas: function (canvas, handleAction) {
         var context = canvas.getContext("2d");
         canvas.width = canvasObj.width;
         canvas.height = canvasObj.height;
@@ -87,7 +79,7 @@ var canvasObj = {
     /**
      * 设置canvas上每个圆点的圆心位置，保存至canvasObj.circleCenterPosition
      */
-    setCircleCenterPosition: function() {
+    setCircleCenterPosition: function () {
         for (var i = 0; i < 3; i++) {
             for (var j = 0; j < 3; j++) {
                 var pos = {
@@ -102,7 +94,7 @@ var canvasObj = {
     /**
      * 画一个圆
      */
-    drawCicle: function(context, point, circle) {
+    drawCicle: function (context, point, circle) {
         context.fillStyle = circle.borderColor;
         context.beginPath();
         context.arc(point.X, point.Y, canvasObj.R, 0, Math.PI * 2, true);
@@ -119,7 +111,7 @@ var canvasObj = {
     /**
      * 画触摸线
      */
-    drawTouchLine: function(context, selectCircleArr, touchPoint) {
+    drawTouchLine: function (context, selectCircleArr, touchPoint) {
         var circleArr = canvasObj.circleCenterPosition;
         context.beginPath();
         for (var i = 0; i < selectCircleArr.length; i++) {
@@ -144,7 +136,7 @@ var canvasObj = {
     /**
      * 画图形
      */
-    drawCanvas: function(context, selectCircleArr, touchPoint) {
+    drawCanvas: function (context, selectCircleArr, touchPoint) {
         var circleArr = canvasObj.circleCenterPosition;
         if (selectCircleArr.length > 0) {
             canvasObj.drawTouchLine(context, selectCircleArr, touchPoint);
@@ -162,7 +154,7 @@ var canvasObj = {
     /**
      * 判断触摸点是否在canvas圆点上，如果在加入到selectCircleArr中
      */
-    selectCircle: function(touches, selectCircleArr) {
+    selectCircle: function (touches, selectCircleArr) {
         for (var i = 0, len = canvasObj.circleCenterPosition.length; i < len; i++) {
             var cur = canvasObj.circleCenterPosition[i];
             var xdiff = Math.abs(cur.X - touches.pageX + canvasObj.left);
@@ -181,7 +173,7 @@ var canvasObj = {
     /**
      * 清除canvas上手势
      */
-    clearTouched: function(canvas) {
+    clearTouched: function (canvas) {
         var context = canvas.getContext("2d");
         context.clearRect(0, 0, canvasObj.width, canvasObj.height);
         canvasObj.drawCanvas(context, [], null);
@@ -190,13 +182,13 @@ var canvasObj = {
     /**
      * 添加监听事件
      */
-    addEvent: function(canvas, context, handleAction) {
+    addEvent: function (canvas, context, handleAction) {
         var selectCircleArr = [];
-        canvas.addEventListener("touchstart", function(e) {
+        canvas.addEventListener("touchstart", function (e) {
             canvasObj.selectCircle(e.touches[0], selectCircleArr);
         }, false);
 
-        canvas.addEventListener("touchmove", function(e) {
+        canvas.addEventListener("touchmove", function (e) {
             e.preventDefault();
             var touches = e.touches[0];
             canvasObj.selectCircle(touches, selectCircleArr);
@@ -204,10 +196,10 @@ var canvasObj = {
             canvasObj.drawCanvas(context, selectCircleArr, { X: touches.pageX, Y: touches.pageY });
         }, false);
 
-        canvas.addEventListener("touchend", function(e) {
+        canvas.addEventListener("touchend", function (e) {
             canvasObj.clearTouched(canvas);
             canvasObj.drawCanvas(context, selectCircleArr, null);
-            setTimeout(function() {
+            setTimeout(function () {
                 handleAction(selectCircleArr.join(""));
                 canvasObj.clearTouched(canvas);
                 selectCircleArr = [];

@@ -1,6 +1,34 @@
-(function() {
-    var setPasswordTimes = 0;
-    var firstInput = "";
+(function () {
+    /**
+     * 自定义canvas选项
+     */
+    var optionsCanvasUI = {
+        width: 300,
+        height: 300,
+        top: 60,
+        left: 40,
+        R: 25,
+        offsetX: 30,
+        offsetY: 30,
+        circle: {
+            borderColor: "#d0d0d0",
+            borderWidth: 2,
+            contendColor: "#ffffff"
+        },
+        circleSelected: {
+            borderColor: "#fd8d00",
+            borderWidth: 2,
+            contendColor: "#ffa723"
+        },
+        touchLine: {
+            lineColor: "#df2b1b",
+            lineWidth: 2
+        }
+
+    };
+    
+    var setPasswordTimes = 0;//设置密码次数
+    var firstInput = "";//保存第一次设置的密码
 
     /**
      * 设置提示信息
@@ -77,10 +105,9 @@
     }
 
     /**
-     * 初始化radio
+     * 设置默认选中radio
      */
-    function initRadio() {
-        //设置默认选中radio
+    function setRadioStatus() {
         var localInfo = getLocalInfo();
         var radios = document.getElementsByName('choose');
         if (typeof localInfo === "string") {
@@ -88,12 +115,27 @@
         } else {
             radios[0].checked = 'checked';
         }
-        //添加radio监听事件
-        // for (var i = 0; i < radios.length; i++) {
-        //     radios[i].onclick = function() {
-        //         canvasObj.clearTouched(canvas);
-        //     }
-        // }
+    }
+
+    /**
+     * 添加radio监听事件
+     */
+    function addRadioEvent(canvas) {
+        var radios = document.getElementsByName('choose');
+        for (var i = 0; i < radios.length; i++) {
+            radios[i].onclick = function () {
+                canvasObj.clearTouched(canvas);
+                setTipsContent('请输入手势密码');
+            }
+        }
+    }
+
+    /**
+     * 初始化radio
+     */
+    function initRadio(canvas) {
+        setRadioStatus();
+        addRadioEvent(canvas);
     }
 
     /**
@@ -101,50 +143,6 @@
      */
     function init() {
         var canvas = document.getElementById("myCanvas");
-        var optionsCanvasUI = {
-            width: 300,
-            height: 300,
-            top: 60,
-            left: 40,
-            R: 25,
-            offsetX: 30,
-            offsetY: 30,
-            circle: {
-                borderColor: "#d0d0d0",
-                borderWidth: 2,
-                contendColor: "#ffffff"
-            },
-            circleSelected: {
-                borderColor: "#fd8d00",
-                borderWidth: 2,
-                contendColor: "#ffa723"
-            },
-            touchLine: {
-                lineColor: "#df2b1b",
-                lineWidth: 2
-            }
-
-        };
-        // var optionsTips = {
-        //     firstSetWrong: function() {
-
-        //     },
-        //     firstSetRight: function() {
-
-        //     },
-        //     secondSetWrong: function() {
-
-        //     },
-        //     secondSetRight: function() {
-
-        //     },
-        //     checkWrong: function() {
-
-        //     },
-        //     checkRight: function() {
-
-        //     }
-        // };
 
         optionsCanvasUI.width = document.body.offsetWidth - 80;
         optionsCanvasUI.height = optionsCanvasUI.width;
@@ -154,7 +152,7 @@
         canvasObj.setCanvas(optionsCanvasUI);
         canvasObj.initCanvas(canvas, handleAction);
 
-        initRadio();
+        initRadio(canvas);
     }
 
     init();
