@@ -27,8 +27,11 @@ export class Compute {
      * 减法
      */
     sub() {
-        this.num2 = -this.num2;
-        this.add();
+        let p1 = this.getNumPoint(this.num1),
+            p2 = this.getNumPoint(this.num2);
+        let m = Math.pow(10, Math.max(p1, p2));
+        let res = (this.num1 * m - this.num2 * m) / m;
+        return res;
     }
 
     /**

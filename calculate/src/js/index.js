@@ -1,6 +1,7 @@
 import { Calculate } from './calculate.js';
 
 export function init() {
+    console.log('start init');
     let dataObj = document.querySelector('#data');
     let wrap = document.querySelector('.wrap');
     let data = '';

@@ -76,6 +76,7 @@
 
 
 function init() {
+    console.log('start init');
     let dataObj = document.querySelector('#data');
     let wrap = document.querySelector('.wrap');
     let data = '';
@@ -2375,10 +2376,7 @@ class Calculate {
      * 计算表达式求值
      */
     getResult() {
-        if (true) {
-            this.toPostExpression();
-            this.calcExpression();
-            console.log(this.result);
+        if (this.toPostExpression() === 'right express' && this.calcExpression() !== 'Input error') {
             return this.result;
         } else {
             return 'Input error';
@@ -2409,15 +2407,22 @@ class Calculate {
             if (!isNaN(item)) {
                 numStack.push(item);
             } else {
-                let num1 = numStack.pop(),
-                    num2 = numStack.pop();
-                console.log(numStack);
-                let res = this.computeResult(num2, num1, item);
-                numStack.push(res); //5 3 -,注意操作符顺序
+                if (numStack.length >= 2) {
+                    let num1 = numStack.pop(),
+                        num2 = numStack.pop();
+                    let res = this.computeResult(num2, num1, item);
+                    numStack.push(res); //5 3 -,注意操作符顺序
+                } else {
+                    this.result = 'Input error';
+                    return;
+                }
             }
         });
-
-        this.result = numStack.pop();
+        if (numStack.length === 1) {
+            this.result = numStack.pop();
+        } else {
+            this.result = 'Input error';
+        }
     }
 
     /**
@@ -2484,7 +2489,11 @@ class Calculate {
                     let item = optStack.pop();
                     while (item != '(') {
                         express.push(item);
-                        item = optStack.pop();
+                        if (optStack.length > 0) {
+                            item = optStack.pop();
+                        } else {
+                            return 'Input error (';
+                        }
                     }
                 } else if (i == '(' || this.isPriority(i, optStack)) {
                     optStack.push(i);
@@ -2499,10 +2508,16 @@ class Calculate {
             num = '';
         }
         while (optStack.length > 0) {
-            express.push(optStack.pop());
+            let opt = optStack.pop();
+            if (opt === '(') {
+                return 'Input error )';
+            } else {
+                express.push(opt);
+            }
         }
         this.express = express;
         console.log(express);
+        return 'right express';
     }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = Calculate;
@@ -2541,8 +2556,11 @@ class Compute {
      * 减法
      */
     sub() {
-        this.num2 = -this.num2;
-        this.add();
+        let p1 = this.getNumPoint(this.num1),
+            p2 = this.getNumPoint(this.num2);
+        let m = Math.pow(10, Math.max(p1, p2));
+        let res = (this.num1 * m - this.num2 * m) / m;
+        return res;
     }
 
     /**
